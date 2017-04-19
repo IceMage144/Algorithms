@@ -1,8 +1,8 @@
 from random import *
 from sys import *
 
-forbiddenChars = ["\n", ",", ":", ";"]
-divChars = [".", "\n\n", "\"", "(", ")"]
+forbiddenChars = [",", ":", ";"]
+divChars = [".", "\n\n", "\"", "(", ")", "”", "\n"]
 
 class Node:
     def __init__(self, name):
@@ -69,7 +69,7 @@ def main():
     gdict = Chain()
     with open(argv[1], 'r') as f:
         k = f.readlines()
-    text = [x for x in divide("".join(k))]
+    text = divide("".join(k))
     for i in range(len(text)):
         text[i] = list(filter(None, takeOutForbs(text[i]).split(" ")))
         text[i] = [x.lower() for x in text[i]]
