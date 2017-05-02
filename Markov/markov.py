@@ -1,8 +1,8 @@
 from random import *
 from sys import *
 
-forbiddenChars = [",", ":", ";"]
-divChars = [".", "\n\n", "\"", "(", ")", "”", "\n"]
+ignoredChars = [",", ":", ";", "-", "!", "?", "\'", "’", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "`", "/"]
+divChars = [".", "\n\n", "\"", "(", ")", "”", "\n", "“"]
 
 class Node:
     def __init__(self, name):
@@ -39,7 +39,7 @@ class Chain:
         return self.entries[key]
 
     def getStart(self):
-        rand = randint(0, len(self.entries))
+        rand = randint(0, len(self.entries)-1)
         keysvec = [key for key in self.entries.keys()]
         return keysvec[rand]
 
@@ -52,7 +52,7 @@ class Chain:
 
 def takeOutForbs(string):
     ret = string
-    for c in forbiddenChars:
+    for c in ignoredChars:
         ret = ret.replace(c, " ")
     return ret
 
@@ -64,7 +64,7 @@ def divide(string):
 
 def main():
     if (len(argv) != 3):
-        print("Wrong number of arguments!")
+        print("Usage: markov.py <input file> <number of output words>")
         return
     gdict = Chain()
     with open(argv[1], 'r') as f:

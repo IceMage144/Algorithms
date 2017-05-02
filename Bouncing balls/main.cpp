@@ -28,7 +28,7 @@ int main() {
     window_bg[3].position = sf::Vector2f(0, video_max_y);
 
     for (int i = 0; i < 4; i++)
-    window_bg[i].color = MWhite;
+        window_bg[i].color = MWhite;
 
     // Setting test balls
     objs.resize(3);
