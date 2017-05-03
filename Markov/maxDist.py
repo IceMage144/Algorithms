@@ -62,8 +62,8 @@ def shift(v):
     ret.append(v[0])
     return ret
 
-def analize():
-    tester = ordv.copy()
+def analize(tester):
+    #tester = ordv.copy()
     for i in range(26):
         tester = shift(tester)
         print(i, " : ", calcDist(tester, ordv))
@@ -78,8 +78,8 @@ def realCase():
         res[corr[l]] += 1
     for i in range(26):
         res[i] = 100*res[i]/len(k)
-    print(res)
-    print("The distance is: ", calcDist(res, ordv))
+    analize(res)
+    #print("The distance is: ", calcDist(res, ordv))
 
 #main()
 realCase()
