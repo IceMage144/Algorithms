@@ -1,0 +1,347 @@
+#!/usr/bin/env python3
+import matplotlib.pyplot as plt
+import numpy as np
+import json
+from PIL import Image, ImageChops
+from optparse import OptionParser
+from random import shuffle
+
+IMGSIZE = 64*64
+DIRS = [[0,1], [1,0], [-1,0], [0,-1]]
+TOLERANCE = 200
+
+class Neuron:
+    def __init__(self, mat, val, count=1):
+        self.mat = np.asarray(mat)
+        self.count = count
+        self.val = val
+
+    def compare(self, inp):
+        diff = (((inp - self.mat)/255)**2)
+        return diff.sum()
+
+    def add(self, mat):
+        self.mat = (self.mat*self.count + mat)//(self.count+1)
+        self.count += 1
+
+    def toDict(self):
+        dic = {}
+        dic["Count"] = self.count
+        dic["Value"] = self.val
+        dic["Matrix"] = self.mat.tolist()
+        return dic
+
+    def getData(self):
+        return self.mat
+
+    def getVal(self):
+        return self.val
+
+def Color(string, num):
+    return (f"\033[1;{num}m{string}\033[0m")
+
+def printDebug(arr):
+    for item, i in zip(arr, range(len(arr))):
+        fin = "\n" if (i+1)%4 == 0 else "   "
+        print(item[0].getVal(), item[1], end=fin)
+    print()
+
+def loadDatabase(fileName):
+    try:
+        print(Color("Loading database...", 33))
+        jsonList = json.load(open(fileName))[1:]
+        ret = []
+        for dic in jsonList:
+            ret.append(Neuron(dic["Matrix"], dic["Value"], dic["Count"]))
+        print(Color("Finish loading", 32))
+        return ret
+    except FileNotFoundError:
+        print(Color("Database not found", 31))
+        return []
+
+def saveDatabase(fileName, neuList):
+    jsonList = []
+    jsonList.append(len(neuList))
+    for neu in neuList:
+        jsonList.append(neu.toDict())
+    with open(fileName, "w+") as f:
+        f.write(json.dumps(jsonList, separators=(", ", ":")))
+    print(Color("Saved database", 32))
+
+def loadCatalog(fileName):
+    try:
+        print(Color("Loading catalog...", 33))
+        jsonList = json.load(open(fileName))[1:]
+        print(Color("Finish loading", 32))
+        return jsonList
+    except FileNotFoundError:
+        print(Color("Catalog not found", 31))
+        return []
+
+def saveCatalog(fileName, catalog):
+    with open(fileName, "w+") as f:
+        f.write(json.dumps(catalog, separators=(", ", ":")))
+    print(Color("Saved catalog", 32))
+
+def isBound(pos, size):
+    if (pos[0] < size[0] and pos[0] >= 0 and pos[1] < size[1] and pos[1] >= 0):
+        return True
+    return False
+
+def findFirst(neuList, val):
+    for neu, i in zip(neuList, range(len(neuList))):
+        if (neu.getVal() == val):
+            return i
+    return -1
+
+def box(img, i, j):
+    xvec = [i, i]
+    yvec = [j ,j]
+    imgSize = img.size
+    queue = [(j ,i)]
+    marked = []
+    while len(queue) != 0:
+        j, i = queue[0]
+        del queue[0]
+        if not isBound((j, i), imgSize):
+            continue
+        if img.getpixel((j, i)) == 0:
+            for d in DIRS:
+                newpos = (j+d[0], i+d[1])
+                if (newpos in marked) or (not isBound(newpos, imgSize)) or (img.getpixel(newpos) == 0):
+                    continue
+                queue.append(newpos)
+                marked.append(newpos)
+            continue
+        if i < xvec[0]:
+            xvec[0] = i
+        elif i > xvec[1]:
+            xvec[1] = i
+        elif j < yvec[0]:
+            yvec[0] = j
+        elif j > yvec[1]:
+            yvec[1] = j
+        for d in DIRS:
+            newpos = (j+d[0], i+d[1])
+            if newpos in marked:
+                continue
+            queue.append(newpos)
+            marked.append(newpos)
+    xvec[1] += 1
+    yvec[1] += 1
+    return (xvec, yvec)
+
+def divideImage(img):
+    i, j = 0, 0
+    negImg = ImageChops.invert(img).point(lambda x : (x > 90) * 255)
+    imgSize = negImg.size
+    subImgs = []
+    xvar = 0
+    yvar = 0
+    xavg = 0
+    yavg = 0
+    for i in range(imgSize[1]):
+        for j in range(imgSize[0]):
+            if negImg.getpixel((j ,i)) != 0:
+                xvec, yvec = box(negImg, i, j)
+                mem = negImg.crop((yvec[0], xvec[0], yvec[1], xvec[1]))
+                ymax = yvec[1] - yvec[0]
+                xmax = xvec[1] - xvec[0]
+                xymax = max(xmax, ymax)
+                subImage = Image.new("L", (xymax, xymax))
+                subImage.paste(mem, ((xymax-ymax)//2, (xymax-xmax)//2))
+                subImage = subImage.resize((64,64))
+                negImg.paste(Image.new("L", (ymax, xmax)), (yvec[0], xvec[0]))
+                if (subImage.size[0] > 3 and subImage.size[1] > 3):
+                    # To follow how the program divides the image, uncomment
+                    # these lines
+                    #plt.imshow(subImage)
+                    #plt.show()
+                    #plt.imshow(negImg)
+                    #plt.show()
+                    subImgs.append([xmax, ymax, xvec, yvec, subImage.copy()])
+                    xvar += xmax**2
+                    yvar += ymax**2
+                    xavg += xmax
+                    yavg += ymax
+    xavg = xavg/len(subImgs)
+    yavg = yavg/len(subImgs)
+    xdev = np.sqrt(xvar/len(subImgs) - xavg**2)
+    ydev = np.sqrt(yvar/len(subImgs) - yavg**2)
+    ret = [[], []]
+    for img in subImgs:
+        if (img[0] > xdev and img[1] > ydev):
+            xmid = (img[2][0] + img[2][1])/2
+            ymid = (img[3][0] + img[3][1])/2
+            ret[0].append(img[4])
+            ret[1].append([xmid, ymid])
+    return (ret, xavg, yavg)
+
+def askNeurons(mat, neuList):
+    resArr = []
+    for neuron in neuList:
+        resArr.append([neuron, neuron.compare(mat)])
+    resArr.sort(key=lambda x : x[1])
+    #printDebug(resArr)
+    return resArr
+
+def addNeuron(neuList, resList, mat, val):
+    if not neuList:
+        neuList.append(Neuron(mat, val))
+        return
+    resList = np.array(resList).transpose()
+    index = findFirst(resList[0], val)
+    if (index == -1) or (resList[1][0] + TOLERANCE < resList[1][index]):
+        neuList.append(Neuron(mat, val))
+    else:
+        resList[0][index].add(mat)
+
+def findCatalog(catalog, mat):
+    for pair in catalog:
+        if (np.array(pair[1]) == mat).all():
+            return pair[0]
+    return -1
+
+
+def learn(neuFile, catFile, images, verb, graph):
+    countRight = 0
+    countWrong = 0
+    neuList = loadDatabase(neuFile)
+    catalog = loadCatalog(catFile)
+    for imgFile in args:
+        imgVec, _, _ = divideImage(Image.open(imgFile).convert("L"))
+        imgVec = imgVec[0]
+        shuffle(imgVec)
+        testLen = len(imgVec)
+        for img, i in zip(imgVec, range(1, testLen+1)):
+            if verb:
+                print(Color(f"Test number {i}/{testLen}", 33))
+            imgData = np.asarray(img)
+            resArr = askNeurons(imgData, neuList)
+            ans = findCatalog(catalog, imgData)
+            if ans == -1:
+                plt.imshow(img)
+                plt.show()
+                ans = int(input("What number is this?\n"))
+            if ans == -1:
+                continue
+            elif ans == -2:
+                break
+            catalog.append([ans, imgData.tolist()])
+            if (not resArr) or (resArr[0][0].getVal() != ans):
+                addNeuron(neuList, resArr, imgData, ans)
+                countWrong += 1
+                if verb:
+                    print(Color("Wrong answer:", 31))
+                    print("Right:", ans)
+                    print("Returned:", -1 if not resArr else resArr[0][0].getVal())
+            else:
+                countRight += 1
+                if verb:
+                    print(Color("Right answer:", 32))
+                    print("Right:", ans)
+                    print("Returned:", resArr[0][0].getVal())
+    saveDatabase(neuFile, neuList)
+    saveCatalog(catFile, catalog)
+    print("Rights:", countRight)
+    print("Wrongs:", countWrong)
+    if graph:
+        print("Showing neurons...")
+        for neuron in neuList:
+            plt.imshow(neuron.getData())
+            plt.show()
+
+
+def interp(neuFile, args, verb):
+    neuList = loadDatabase(neuFile)
+    count = 0
+    for imgFile in args:
+        imgVec, xavg, yavg = divideImage(Image.open(imgFile).convert("L"))
+        count = 0
+        chars = []
+        for img, pos in zip(imgVec[0], imgVec[1]):
+            imgData = np.asarray(img)
+            resArr = askNeurons(imgData, neuList)
+            chars.append([resArr[0][0].getVal(), pos])
+            #print(resArr[0][0].getVal(), end=" ")
+            count += 1
+        chars.sort(key=lambda x: x[1][0])
+        ordered = []
+        i = 0
+        while (i < count):
+            row = []
+            beg = chars[i][1][0]
+            while (i < count and abs(chars[i][1][0] - beg) < xavg/2):
+                row.append(chars[i])
+                i += 1
+            row.sort(key=lambda x: x[1][1])
+            ordered.append(row)
+        for row in ordered:
+            mem = row[0][1][1]
+            for item in row:
+                if (item[1][1] - mem > yavg/2):
+                    print(" ", end="")
+                print(item[0], end="")
+                mem = item[1][1]
+            print()
+        if verb:
+            print(Color(f"\n{count} symbols found", 32))
+
+if __name__ == "__main__":
+    usage = """Usage: %prog [-i] [-n FILE] image1 [image2] ...
+       %prog -l [-c FILE] [-n FILE] image1 [image2] ..."""
+    parser = OptionParser(usage=usage)
+    parser.add_option("-c", "--catalog",
+                      action="store",
+                      dest="catDB",
+                      type="string",
+                      default="catalog.json",
+                      metavar="FILE",
+                      help="""JSON file that contains the right correspondence
+                           of subimage and value (used only for learning
+                           process) (default: catalog.json)""")
+    parser.add_option("-g", "--graph",
+                      action="store_true",
+                      dest="graph",
+                      help="""Shows a graphical representation of the neurons at
+                           the end of the learning process""")
+    parser.add_option("-i", "--interp",
+                      action="store_false",
+                      dest="mode",
+                      default=False,
+                      help="Enables interpret mode (default)")
+    parser.add_option("-l", "--learn",
+                      action="store_true",
+                      dest="mode",
+                      help="Enables learning mode")
+    parser.add_option("-n", "--neurons",
+                      action="store",
+                      dest="neuDB",
+                      type="string",
+                      default="database.json",
+                      metavar="FILE",
+                      help="""JSON file that contains the neurons. If the file
+                            doesn't exists, it will be created at the end of the
+                            process (default: database.json)""")
+    parser.add_option("-t", "--tolerance",
+                      action="store",
+                      dest="tol",
+                      type="int",
+                      default=300,
+                      help="""Changes the tolerance of learning. Higher the
+                            tolerance, less neurons (default: 3)""")
+    parser.add_option("-v", "--verbose",
+                      action="store_true",
+                      dest="verbose",
+                      help="Enables verbose mode")
+
+    (flags, args) = parser.parse_args()
+
+    if args:
+        TOLERANCE = flags.tol*100
+        if flags.mode:
+            learn(flags.neuDB, flags.catDB, args, flags.verbose, flags.graph)
+        else:
+            interp(flags.neuDB, args, flags.verbose)
+    else:
+        parser.print_usage()
