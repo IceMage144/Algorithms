@@ -222,7 +222,7 @@ def learn(neuFile, catFile, images, verb, graph):
             if ans == -1:
                 plt.imshow(img)
                 plt.show()
-                ans = int(input("What number is this?\n"))
+                ans = input("What character is this?\n")
             if ans == -1:
                 continue
             elif ans == -2:
