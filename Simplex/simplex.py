@@ -1,7 +1,7 @@
 # A silly implementation of simplex algorithm
 #
 # It does what you do by hand and still fails in some cases
-# This program come with a problem generator program (problem_gen.py)
+# This program comes with a problem generator program (problem_gen.py)
 # and with an in.txt file with some test cases and their answers
 
 # Input format:
