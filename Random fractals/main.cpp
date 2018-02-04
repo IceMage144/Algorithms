@@ -25,7 +25,7 @@ std::string NumberToString ( T Number ) {
     return ss.str();
 }
 
-void Strap() {
+void Triangle() {
     sf::RenderWindow window(sf::VideoMode(W, H), "Random fractals");
     sf::VertexArray window_bg(sf::Quads, 4);
     vector<sf::CircleShape> poly;
@@ -232,11 +232,11 @@ void Fern() {
 int main() {
     string s;
     cout << "Select the fractal you want to plot:" << endl;
-    cout << "   - Strapinski's triangle (t)" << endl;
+    cout << "   - Sierpinski's triangle (t)" << endl;
     cout << "   - Barnsley's fern (f)" << endl;
     cin >> s;
     if (!s.compare("t"))
-        Strap();
+        Triangle();
     else if (!s.compare("f"))
         Fern();
     else

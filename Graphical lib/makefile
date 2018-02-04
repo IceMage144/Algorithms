@@ -8,5 +8,5 @@ CFLAGS = -I.
 master.o: master.cpp
 	$(CC) -c $< $(CFLAGS)
 
-test: polygons.o master.o pgmdrawer.o
+exec: polygons.o master.o pgmdrawer.o
 	$(CC) $^ -o $@ $(CFLAGS)

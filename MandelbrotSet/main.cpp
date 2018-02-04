@@ -49,12 +49,11 @@ int main() {
 
     //window.draw(window_bg);
 
-    croma.push_back(sf::Color(0, 0, 255));
     for (int i = 0; i < 255; i += 15)
         croma.push_back(sf::Color(i, i, 255));
     for (int i = 255; i > 0; i -= 15)
         croma.push_back(sf::Color(255, 255, i));
-    for (int i = 255; i > 0; i -= 15)
+    for (int i = 255; i >= 0; i -= 15)
         croma.push_back(sf::Color(i, i, 0));
 
     window.setView(view1);
@@ -80,7 +79,7 @@ int main() {
             float tmp = 0.0;
             val[0] = 0.0;
             val[1] = 0.0;
-            while (dist < 4 && iterr <= 51) {
+            while (dist < 4 && iterr < 51) {
                 tmp = val[0]*val[0] - val[1]*val[1] + wptrx;
                 val[1] = 2*val[0]*val[1] + wptry;
                 val[0] = tmp;

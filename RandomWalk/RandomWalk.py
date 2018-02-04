@@ -32,6 +32,7 @@ def main():
         wkrs = int(sys.argv[2])
     except IndexError:
         print("Usage: RandomWalk <file with initial seed> <number of walkers>")
+        return
     got = False
     mat = []
     maxX = 0

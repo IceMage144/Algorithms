@@ -223,11 +223,12 @@ def learn(neuFile, catFile, images, verb, graph):
                 plt.imshow(img)
                 plt.show()
                 ans = input("What character is this?\n")
-            if ans == -1:
+                if ans != "-1" and ans != "-2":
+                    catalog.append([ans, imgData.tolist()])
+            if ans == "-1":
                 continue
-            elif ans == -2:
+            elif ans == "-2":
                 break
-            catalog.append([ans, imgData.tolist()])
             if (not resArr) or (resArr[0][0].getVal() != ans):
                 addNeuron(neuList, resArr, imgData, ans)
                 countWrong += 1
@@ -249,6 +250,7 @@ def learn(neuFile, catFile, images, verb, graph):
         print("Showing neurons...")
         for neuron in neuList:
             plt.imshow(neuron.getData())
+            plt.title(neuron.getVal())
             plt.show()
 
 
