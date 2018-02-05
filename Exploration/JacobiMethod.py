@@ -52,17 +52,17 @@ def main():
     print("=== Starting matrix A ===")
     for i in range(n):
         for j in range(n):
-            A[i][j] = float(input(f"Enter a{i}{j}: "))
+            A[i][j] = float(input(f"Enter a{i+1}{j+1}: "))
     print("=== Finished matrix A ===")
     b = [[0] for i in range(n)]
     print("=== Starting b vector ===")
     for i in range(n):
-        b[i][0] = float(input(f"Enter b{i}: "))
+        b[i][0] = float(input(f"Enter b{i+1}: "))
     print("=== Finished b vector ===")
     x = [[0] for i in range(n)]
     print("=== Starting guess vector ===")
     for i in range(n):
-        x[i][0] = float(input(f"Enter x{i}: "))
+        x[i][0] = float(input(f"Enter x{i+1}: "))
     print("=== Finished guess vector ===")
     counter = 0
     xMem = [[0] for i in range(n)]

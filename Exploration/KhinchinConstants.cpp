@@ -32,11 +32,11 @@ double harmMeanSum(double mean, double newFac, double qnt, double power){
 int main(){
 	double num, res = 1.0;
 	int prec, power;
-	cout << "Índice da constante:" << endl;
+	cout << "Constant index:" << endl;
 	cin >> power;
-	cout << "Número a ser avaliado:" << endl;
+	cout << "Initial number:" << endl;
 	cin >> num;
-	cout << "Precisão (número de 1 a 100000):" << endl;
+	cout << "Precision (number from 1 to 1000):" << endl;
 	cin >> prec;
 	khinNum(num, prec);
 	if (power == 0){

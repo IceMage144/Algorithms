@@ -304,7 +304,7 @@ can solve the equation.
 Notes:
 - With this fuction I found that, for the same value of "a", the greater the
 difference a-w, the higher the number "x", with 2^a beeing the greater "x".
-- It displays the details of the road encoded in a binary number, where 1 is
+- It displays the details of the route encoded in a binary number, where 1 is
 a double step of the kind odd-even (f(f(x)) = (3x+1)/2), and the 0 is the even
 step (f(x) = x/2). The steps are read from the right to the left.
 - At the end of the output, it shows a list with only the odd numbers from the
@@ -313,7 +313,7 @@ original output.
 Essa função recebe um valor de "a" e acha todas as trincas (w, x, z) que
 resolvem a equação.
 Notas:
-- Com essa função eu descobri que , para o mesmo vaalor de "a", quanto maior a
+- Com essa função eu descobri que, para o mesmo valor de "a", quanto maior a
 diferença a-w, maior o número "x", sendo o maior "x" o 2^a.
 - A função mostra detalhes sobre a rota codificada em um número binário, onde
 1 é um passo duplo do tipo ímpar par (f(f(x)) = (3x+1)/2), e o 0 é o passo par
@@ -365,7 +365,7 @@ def asolver (plot=0, two=-1):
 	if plot == 0:
 		print("================ Taking out the evens ================")
 	else:
-		print("================ two =", two, "================")
+		print("================ two =", two+1, "================")
 	print("power of three    inicial number    3-smooth    steps")
 	for i in range(len(mem)):
 		digits[0] = countdigs(mem[i][0])
@@ -435,9 +435,9 @@ x*3^w + z = 0      mod 2    (We know that 2^a = 0 mod 2 because a > b_0)
 When we do z mod 2, we are doing sum[i from 0 to w-1](2^(b_i)*3^i) mod 2.
 
 We have two options to find z mod 2:
-- If b_(w-1) = 0, than we know that b_(w-n) > b_(w-1), for all n > 1, so all the
-other terms are multiple of 2, except the last one, that is 2^b_(w-1)*3^(w-1) =
-3^(w-1) and is odd. So z = 3^(w-1) = 1 mod 2.
+- If b_(w-1) = 0 = p-1, and we know that b_(w-n) > b_(w-1), for all n > 1, so
+all the other terms are multiple of 2, except the last one, that is
+2^b_(w-1)*3^(w-1) = 3^(w-1), and is odd. So z = 3^(w-1) = 1 mod 2.
 - If b_(w-1) != 0, it can only be greater than 0, so we have that
 b_(w-n) > b_(w-1), for all n > 1, so all the terms of the summation are 0 mod 2,
 then z = 0 mod 2.
@@ -482,7 +482,7 @@ Quando fazemos z mod 2, nós estamos fazendo sum[i from 0 to w-1](2^(b_i)*3^i) m
 Temos duas opções para achar z mod 2:
 - Se b_(w-1) = 0, então sabemos que b_(w-n) > b_(w-1), para qualquer n > 1,
 então todos os outros termos são múltiplos de 2, exceto o último, que é
-2^b_(w-1)*3^(w-1) = 3^(w-1) e é ímpar. Então z = 3^(w-1) = 1 mod 2.
+2^b_(w-1)*3^(w-1) = 3^(w-1), e é ímpar. Então z = 3^(w-1) = 1 mod 2.
 - Se b_(w-1) != 0, ele só pode ser maior que 0, então temos b_(w-n) > b_(w-1),
 para todo n > 1, então todos os termos da soma são iguais a 0 mod 2, então
 z = 0 mod 2.
@@ -545,8 +545,14 @@ def xwsolver (massive=0, num=0, three=0):
 Continuous version of "xwsolver". It just start with a rational "w" and it's
 less precise due to the overflow.
 
+This is an attempt to make a continuous version, so it's not really the
+continuous version.
+
 Versão contínua do "xwsolver". A única diferença é que ela começa com um "w"
 racional e não é tão precisa por causa do overflow.
+
+Essa é uma tentativa de fazer uma versão contínua, portanto não é uma versão
+contínua da verdade.
 '''
 def xwsolvertwo (massive=0, num=0, three=0):
 	if massive == 0:
@@ -648,11 +654,11 @@ def xasolver ():
 	print("3-smooth        three")
 	for i in range(top):
 		three = math.log((2**two-i)/num, 3)
-		if three%1 == 0:
-			print(i, end="")
-			for j in range(16-countdigs(i)):
-				print(" ", end="")
-			print(three)
+		#if three%1 == 0:
+		print(i, end="")
+		for j in range(16-countdigs(i)):
+			print(" ", end="")
+		print(three)
 
 def main ():
 	print("What function do you want to use?")
@@ -708,5 +714,5 @@ def main ():
 	else:
 		print("Invalid input, quiting the program.....")
 
-
-main()
+if __name__ == "__main__":
+	main()

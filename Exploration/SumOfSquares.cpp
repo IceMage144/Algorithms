@@ -72,9 +72,9 @@ int main(){
 	int lim, counter = 1, temp = 0, k = 0;
 	int square;
 	string showFives;
-	cout << "Qual o limite superior? (max = 30000)" << endl;
+	cout << "What's the superior limit? (max = 30000)" << endl;
 	cin >> lim;
-	cout << "Mostrar os múltiplos de 5? (somente/nenhum/todos)" << endl;
+	cout << "Show multiples of 5? (yes/no/only)" << endl;
 	cin >> showFives;
 	primes[0] = 2;
 	primesInv[2] = 0;
@@ -118,7 +118,7 @@ int main(){
 		}
 	}
 	for (int i = 1; i <= counter; i++){
-		if ((showFives == "somente" || showFives == "todos") && notPrimes[i]%5 == 0){
+		if ((showFives == "only" || showFives == "yes") && notPrimes[i]%5 == 0){
 			cout << notPrimes[i] << " = " << factors1[i] << "^2 + " << factors2[i] << "^2";
 			if (notPrimes[i] == 5){
 				cout << endl;
@@ -127,7 +127,7 @@ int main(){
 				cout << " <-- mod " << md[i] << endl;
 			}
 		}
-		else if ((showFives == "todos" || showFives == "nenhum") && notPrimes[i]%5 != 0){
+		else if ((showFives == "yes" || showFives == "no") && notPrimes[i]%5 != 0){
 			cout << notPrimes[i] << " = " << factors1[i] << "^2 + " << factors2[i] << "^2";
 			if (primes[primesInv[notPrimes[i]]] != notPrimes[i]){
 				cout << " <-- mod " << md[i] << endl;
