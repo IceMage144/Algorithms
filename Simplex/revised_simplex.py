@@ -1,3 +1,23 @@
+# A silly implementation of simplex algorithm
+#
+# It does what you do by hand and still fails in some cases
+# This program comes with a problem generator program (problem_gen.py)
+# and with an in.txt file with some test cases and their answers
+
+# Input format:
+# If you want this system:
+# max mx + ny + pz
+# subj
+# ax + by + cz <= d
+# ex + fy + gz >= h
+#
+# You should input (the first number is the number of variables and the second
+# is the number of inequalities):
+# 3 2
+# a b c d
+# -e -f -g -h
+# m n p
+
 from fractions import Fraction
 from sys import argv
 import numpy as np

@@ -18,5 +18,4 @@ computer. This was something I didn't noticed when I made this.
 
 Make sure you have SFML installed. An executable file can be generated running
 `make exec` at the command line. Click on the screen to spawn a black hole.
-
 ![Bouncing balls print](/bouncing_balls.png)
