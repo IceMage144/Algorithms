@@ -72,7 +72,6 @@ def main():
     def plot(update):
         screen = update
         c.set_data(screen)
-        #timeText.set_text(f"Time = {time}")
         return c
     # create animation
     ani = FuncAnimation(fig, plot, update, interval=10)

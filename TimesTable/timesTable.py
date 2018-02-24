@@ -30,7 +30,7 @@ def animate(mod, step):
         pts.append([cos(tau*i/mod), sin(tau*i/mod)])
         lines.append(ax.plot([pts[i][0], pts[i][0]], [pts[i][1], pts[i][1]], "r-")[0])
     def update():
-        for factor in np.arange(0, mod, step):
+        for factor in np.arange(step, mod, step):
             for i, j in zip(range(mod), np.arange(0, factor*mod, factor)):
                 lines[i].set_xdata([pts[i][0], cos(tau*(j%mod)/mod)])
                 lines[i].set_ydata([pts[i][1], sin(tau*(j%mod)/mod)])

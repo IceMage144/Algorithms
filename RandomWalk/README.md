@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Reproduce a stochastic chaotic system seen at a
+Reproduce a stochastic chaotic system ([diffusion-limited aggregation](https://en.wikipedia.org/wiki/Diffusion-limited_aggregation)) seen at a
 [MAC0209 (Modeling and simulating)](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=MAC0209)
 class.
 
