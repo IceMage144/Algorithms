@@ -13,5 +13,5 @@ labled from 0 to m-1, then we connect the point "y" with the point "z" if
 
 Execute the program through a command line using `python timesTable.py`, then
 follow the instructions.
-![table](/screenshots/36.png)
 
+![table](./screenshots/36.png)

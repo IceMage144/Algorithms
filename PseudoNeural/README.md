@@ -20,4 +20,5 @@ you to classify the characters. Answer them and make this for the other train
 files too. Once you've finished, you can extract the text of an image using
 `./charRecog <image>`. More information can be found if you run
 `./charRecog --help`.
-![neuron print](/0_print.png)
+
+![neuron print](./0_print.png)

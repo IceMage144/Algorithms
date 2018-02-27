@@ -9,4 +9,5 @@ random moving dots.
 
 Generate an executable using `make exec` command, execute it and follow the
 instructions.
-![fern print](/fern.png) ![triangle print](/triangle.png)
+
+![fern print](./fern.png) ![triangle print](./triangle.png)

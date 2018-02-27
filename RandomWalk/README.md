@@ -14,4 +14,5 @@ Generates a random-branching structure using random walking dots.
 
 Just execute `python random-walk.py <initial seed file> <number of walkers>`.
 You can use the file in.txt as a initial seed file and start it with 100 walkers.
-![random walk print](/random-walk.png)
+
+![random walk print](./random-walk.png)

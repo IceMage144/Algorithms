@@ -16,4 +16,5 @@ a mutation. The competition starts with 32 balls.
 ### How to use
 
 Just run `python evo.py` at the command line and watch the balls fight.
-![evo print](/evo.png)
+
+![evo print](./evo.png)
