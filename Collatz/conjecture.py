@@ -59,6 +59,23 @@ b_i são zero ou inteiros positivos e b_(i-1) > b_i > b_(i+1). Também chamado d
 	- a é o número de pares achados durante os passos ou o número de aplicações
 da regra para pares da função (f(x) = x/2). Também chamado de "two" ou "power
 of the two" nesse programa.
+
+
+Algumas anotações:
+	- Seja n um número natural, a_1, a_2, ..., a_t fatores primos de n e 
+b_1, b_2, ..., b_s fatores primos de n+1, então a_i != b_j para todo i, j.
+	- Ao longo de toda a sequência, só podemos ter um número ímpar múltiplo de
+3, pois não podemos chegar em múltiplos de 3 a partir de números ímpares.
+	- Também não podemos chegar em uma potência ímpar de 2 a partir de
+números ímpares.
+	- Sempre há um número da forma 6n+4 na sequência, pois sempre atingiremos
+algum número dessa forma, não importando onde começamos. Em especial, se
+começarmos em um número da forma 6n+4, depois de dividí-lo por 2 até chegarmos
+em um ímpar, multiplicarmos por 3 e somarmos 1, chegaremos em um número da forma
+6n+4.
+	- Números da forma 6n+4 podem ser obtidos tanto a partir de um número par
+quanto de um ímpar.
+
 '''
 
 gr = 1.6180339
@@ -96,6 +113,16 @@ def nexttwo (top, vec, dig):
 			vec[i-1] = vec[i] + 1
 		num, vec = nexttwo(top, vec, dig+1)
 	return num, vec
+
+def factors(num):
+	ctr = 2
+	l = []
+	while num != 1:
+		while num%ctr == 0:
+			num //= ctr
+			l.append(ctr)
+		ctr += 1
+	return l
 
 '''
 This function finds "3-smooth"s.
@@ -172,15 +199,20 @@ def collatz (arg):
 	mem = num
 	two = 0
 	three = 0
+	lthree = -1
 	while num != 1:
 		if num%2 == 0:
 			if arg == -1:
-				print("even", num)
-			num = int(num/2)
+				if lthree != three and (three != 0 or (num-4)/6 == (num-4)//6):
+					print("even", num, "  ==> ", (num-4)//6)
+					lthree = three
+				else:
+					print("even", num)
+			num = num//2
 			two += 1
 		else:
 			if arg == -1:
-				print("odd ", num)
+				print("odd ", num, "  ==> ", factors(num))
 			num = 3*num + 1
 			three += 1
 	if arg == -1:

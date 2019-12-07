@@ -7,7 +7,7 @@ from optparse import OptionParser
 from random import shuffle
 
 IMGSIZE = 64*64
-DIRS = [[0,1], [1,0], [-1,0], [0,-1]]
+DIRS = [[0,1], [1,0], [-1,0], [0,-1], [1, 1], [-1, 1], [1, -1], [-1, -1]]
 TOLERANCE = 200
 
 class Neuron:
@@ -83,7 +83,7 @@ def saveCatalog(fileName, catalog):
         f.write(json.dumps(catalog, separators=(", ", ":")))
     print(Color("Saved catalog", 32))
 
-def isBound(pos, size):
+def isInsideBounds(pos, size):
     if (pos[0] < size[0] and pos[0] >= 0 and pos[1] < size[1] and pos[1] >= 0):
         return True
     return False
@@ -99,41 +99,46 @@ def box(img, i, j):
     yvec = [j ,j]
     imgSize = img.size
     queue = [(j ,i)]
-    marked = []
+    marked = {(j ,i)}
     while len(queue) != 0:
         j, i = queue[0]
         del queue[0]
-        if not isBound((j, i), imgSize):
-            continue
-        if img.getpixel((j, i)) == 0:
+        # if not isInsideBounds((j, i), imgSize):
+        #     continue
+        if img.getpixel((j, i)) != 0:
             for d in DIRS:
                 newpos = (j+d[0], i+d[1])
-                if (newpos in marked) or (not isBound(newpos, imgSize)) or (img.getpixel(newpos) == 0):
+                if (newpos in marked) or (not isInsideBounds(newpos, imgSize)):
                     continue
                 queue.append(newpos)
-                marked.append(newpos)
-            continue
-        if i < xvec[0]:
-            xvec[0] = i
-        elif i > xvec[1]:
-            xvec[1] = i
-        elif j < yvec[0]:
-            yvec[0] = j
-        elif j > yvec[1]:
-            yvec[1] = j
-        for d in DIRS:
-            newpos = (j+d[0], i+d[1])
-            if newpos in marked:
-                continue
-            queue.append(newpos)
-            marked.append(newpos)
+                marked.add(newpos)
+            # continue
+            xvec[0] = min(xvec[0], i)
+            xvec[1] = max(xvec[1], i)
+            yvec[0] = min(yvec[0], j)
+            yvec[1] = max(yvec[1], j)
+        # if i < xvec[0]:
+        #     xvec[0] = i
+        # elif i > xvec[1]:
+        #     xvec[1] = i
+        # elif j < yvec[0]:
+        #     yvec[0] = j
+        # elif j > yvec[1]:
+        #     yvec[1] = j
+        # for d in DIRS:
+        #     newpos = (j+d[0], i+d[1])
+        #     if newpos in marked:
+        #         continue
+        #     queue.append(newpos)
+        #     marked.append(newpos)
     xvec[1] += 1
     yvec[1] += 1
     return (xvec, yvec)
 
 def divideImage(img):
     i, j = 0, 0
-    negImg = ImageChops.invert(img).point(lambda x : (x > 90) * 255)
+    # negImg = ImageChops.invert(img).point(lambda x : (x > 90) * 255)
+    negImg = ImageChops.invert(img).point(lambda x : (x < 90) * 255)
     imgSize = negImg.size
     subImgs = []
     xvar = 0
@@ -144,21 +149,22 @@ def divideImage(img):
         for j in range(imgSize[0]):
             if negImg.getpixel((j ,i)) != 0:
                 xvec, yvec = box(negImg, i, j)
-                mem = negImg.crop((yvec[0], xvec[0], yvec[1], xvec[1]))
                 ymax = yvec[1] - yvec[0]
                 xmax = xvec[1] - xvec[0]
-                xymax = max(xmax, ymax)
-                subImage = Image.new("L", (xymax, xymax))
-                subImage.paste(mem, ((xymax-ymax)//2, (xymax-xmax)//2))
-                subImage = subImage.resize((64,64))
-                negImg.paste(Image.new("L", (ymax, xmax)), (yvec[0], xvec[0]))
-                if (subImage.size[0] > 3 and subImage.size[1] > 3):
+                if (xmax > 1 and ymax > 1):
+                    mem = negImg.crop((yvec[0], xvec[0], yvec[1], xvec[1]))
+                    xymax = max(xmax, ymax) + 4
+                    subImage = Image.new("L", (xymax, xymax))
+                    subImage.paste(mem, ((xymax-ymax)//2, (xymax-xmax)//2))
+                    subImage = subImage.resize((64, 64))
+                    negImg.paste(Image.new("L", (ymax, xmax)), (yvec[0], xvec[0]))
                     # To follow how the program divides the image, uncomment
                     # these lines
-                    #plt.imshow(subImage)
-                    #plt.show()
-                    #plt.imshow(negImg)
-                    #plt.show()
+                    # plt.imshow(subImage)
+                    # plt.show()
+                    # plt.imshow(negImg)
+                    # plt.show()
+                    # ------------------------------------------------------
                     subImgs.append([xmax, ymax, xvec, yvec, subImage.copy()])
                     xvar += xmax**2
                     yvar += ymax**2
@@ -273,7 +279,7 @@ def interp(neuFile, args, verb):
         while (i < count):
             row = []
             beg = chars[i][1][0]
-            while (i < count and abs(chars[i][1][0] - beg) < xavg/2):
+            while (i < count and abs(chars[i][1][0] - beg) < xavg):
                 row.append(chars[i])
                 i += 1
             row.sort(key=lambda x: x[1][1])
@@ -281,7 +287,7 @@ def interp(neuFile, args, verb):
         for row in ordered:
             mem = row[0][1][1]
             for item in row:
-                if (item[1][1] - mem > yavg/2):
+                if (item[1][1] - mem > 2.0*yavg):
                     print(" ", end="")
                 print(item[0], end="")
                 mem = item[1][1]
