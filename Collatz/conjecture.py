@@ -1,15 +1,11 @@
-import math
-import matplotlib.pyplot as plt
-import numpy as np
-
 '''
 This program was made to analyze the "Collatz conjecture" or the "3n+1
 conjecture" (https://en.wikipedia.org/wiki/Collatz_conjecture).
 To make this program, I analized the result of all the aplications of the
 function at an initial number, eg:
-	   ┌ 3x+1  , if x is odd
+       ┌ 3x+1  , if x is odd
 f(x) = ┤
-	   └ x/2   , if x is even
+       └ x/2   , if x is even
 
 If we have f(f(f(f(f(f(f(3))))))) = 1 we can expand this to get
 (3*3^2 + 5)/2^5 = 1
@@ -36,9 +32,9 @@ Esse programa foi feito para analizar a "Conjectura de Collatz" ou a "Conjectura
 3n+1" (https://en.wikipedia.org/wiki/Collatz_conjecture).
 Para fazer esse programa, eu analizei o resultado de todas as aplicações da
 função em um número inicial, ex:
-	   ┌ 3x+1  , se x for ímpar
+       ┌ 3x+1  , se x for ímpar
 f(x) = ┤
-	   └ x/2   , se x for par
+       └ x/2   , se x for par
 
 Se tivermos f(f(f(f(f(f(f(3))))))) = 1 nós podemos expandir isso para obter
 (3*3^2 + 5)/2^5 = 1
@@ -68,18 +64,33 @@ b_1, b_2, ..., b_s fatores primos de n+1, então a_i != b_j para todo i, j.
 3, pois não podemos chegar em múltiplos de 3 a partir de números ímpares.
 	- Também não podemos chegar em uma potência ímpar de 2 a partir de
 números ímpares.
-	- Sempre há um número da forma 6n+4 na sequência, pois sempre atingiremos
+	- Sempre há um número da forma 6n+4 na sequência [4], pois sempre atingiremos
 algum número dessa forma, não importando onde começamos. Em especial, se
 começarmos em um número da forma 6n+4, depois de dividí-lo por 2 até chegarmos
 em um ímpar, multiplicarmos por 3 e somarmos 1, chegaremos em um número da forma
 6n+4.
 	- Números da forma 6n+4 podem ser obtidos tanto a partir de um número par
 quanto de um ímpar.
+	- Talvez seja possível achar todos os z's que satisfazem a equação dado
+um par (a, w) (ou seja, sem depender do valor de x) usando um método parecido
+com o do "xwsolver". Dada a equação x*3^w = 2^a - z, se aplicarmos módulo 3^n,
+para todo 0 < n <= w, zeramos o lado esquerdo e podemos seguir o mesmo
+algoritmo para achar as potências de 2 de z, limitando-as por a. O problema
+é que é possível que haja mais de um valor de z, pois as potências de 2 podem
+pular números, o que dá a liberdade de pular números diferentes que dão
+módulo 0 do mesmo jeito. Outra observação é que dessa vez se o módulo não
+der 0, temos que ir aumentando a potência do 2 até que dê certo, já que
+temos que ter todas as potências de 3.
+	- A potência de 2 associada ao 3^(w-1) no 3-smooth é sempre zero.
 
 '''
 
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+
 gr = 1.6180339
-fgr = 1.5873
+fgr = 1.5873 # Maybe log_2(3) ?
 lgt = math.log(2, 3)
 
 def sorting (mat):
@@ -547,7 +558,6 @@ def xwsolver (massive=0, num=0, three=0):
 	aux = num
 	mem = 0
 	mod = 1
-	a = 0
 	twos = [0 for i in range(three)]
 	firsttwos = 0
 	summ = 0
@@ -555,7 +565,6 @@ def xwsolver (massive=0, num=0, three=0):
 		aux /= 2
 		firsttwos += 1
 	while (three > 0):
-		a = 0
 		mem = bmod(aux, twos, three, mod)
 		while (mem == 0):
 			mod += 1
